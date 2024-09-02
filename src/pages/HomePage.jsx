@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import Nav from "./Nav";
-import ChatRoom from "./ChatRoom";
-import PeopleList from "./PeopleList";
+import Nav from "../components/Nav";
+import ChatRoom from "../components/ChatRoom";
+import PeopleList from "../components/PeopleList";
 import useUserHook from "../Hooks/useUserHook";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import Drawer from "../components/Drawer";
 
 const HomePage = () => {
   const [ischatRoom, setIsChatRoom] = useState(true);
   const nav = useNavigate();
-
   const { currentUser, isError, isLoading } = useUserHook();
 
   useEffect(() => {
@@ -29,7 +30,7 @@ const HomePage = () => {
             ischatRoom && " border-2  border-gray-800 font-bold"
           } py-1`}
         >
-          Chat Room
+          People
         </button>
         <button
           onClick={() => setIsChatRoom(false)}
@@ -37,19 +38,20 @@ const HomePage = () => {
             !ischatRoom && " border-2  border-gray-800 font-bold"
           } py-1`}
         >
-          People
+          Public Chat Room
         </button>
       </div>
 
       {ischatRoom ? (
         <div className="w-full">
-          <ChatRoom />
+          <PeopleList />
         </div>
       ) : (
         <div className="w-full">
-          <PeopleList />
+          <ChatRoom />
         </div>
       )}
+      <Drawer/>
     </div>
   );
 };

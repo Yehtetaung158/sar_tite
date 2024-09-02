@@ -2,7 +2,7 @@ import { addDoc, collection, Timestamp } from "firebase/firestore";
 import React, { useState } from "react";
 import { db } from "../store/firebase";
 
-const PrivateSentbox = ({ currentUid, currentUser }) => {
+const PrivateSentbox = ({ currentUid, currentUser,setIsUserLists }) => {
   const [message, setMessage] = useState("");
 
   const messageSentHandle = async (e) => {
@@ -30,6 +30,9 @@ const PrivateSentbox = ({ currentUid, currentUser }) => {
         onSubmit={messageSentHandle}
         className="w-full flex gap-2 items-center justify-between"
       >
+        <button onClick={()=>setIsUserLists(true)} className="text-white bg-gray-700 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">
+          Lists
+        </button>
         <div className="relative flex-grow w-full">
           <input
             type="text"

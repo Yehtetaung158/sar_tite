@@ -1,34 +1,12 @@
-import { useState, useEffect, useRef } from "react";
-import { auth, db } from "../store/firebase";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import {  useEffect, useRef } from "react";
+import useUserHook from "../Hooks/useUserHook";
+import useGetDoc from "../Hooks/useGetDoc";
 
 const PrivateMessages = ({ currentUid }) => {
-  const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
-  const [currentUser, setCurrentUser] = useState(null);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setCurrentUser(user);
-      } else {
-        setCurrentUser(null);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    const qu = query(
-      collection(db, "chatRooms", currentUid, "messages"),
-      orderBy("timestamp", "asc")
-    );
-    const unsubscribe = onSnapshot(qu, (snapshot) => {
-      setMessages(snapshot.docs.map((doc) => doc.data()));
-    });
-
-    return () => unsubscribe();
-  }, [currentUid]);
+  const { currentUser } = useUserHook();
+  const collectionPath = `chatRooms/${currentUid}/messages`;
+  const { messages, isError, isLoading } = useGetDoc(collectionPath);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -45,7 +23,7 @@ const PrivateMessages = ({ currentUid }) => {
       <ul className="space-y-3">
         {messages.map((message, index) => {
           const isCurrentUser = message.uid === currentUser?.uid;
-          console.log(currentUser?.uid);
+          // console.log(currentUser?.uid);
           return (
             <li
               key={index}

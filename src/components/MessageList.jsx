@@ -1,31 +1,12 @@
-import { useState, useEffect, useRef } from "react";
-import { auth, db } from "../store/firebase";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { useEffect, useRef } from "react";
+import useUserHook from "../Hooks/useUserHook";
+import useGetDoc from "../Hooks/useGetDoc";
 
 const MessageList = () => {
-  const [messages, setMessages] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
+  const collectionPath="messages"
+  const {messages,isLoading,isError}=useGetDoc(collectionPath)
   const messagesEndRef = useRef(null);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setCurrentUser(user);
-      } else {
-        setCurrentUser(null);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    const qu = query(collection(db, "messages"), orderBy("timestamp", "asc"));
-    const unsubscribe = onSnapshot(qu, (snapshot) => {
-      setMessages(snapshot.docs.map((doc) => doc.data()));
-    });
-
-    return () => unsubscribe();
-  }, []);
+  const {currentUser}=useUserHook()
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

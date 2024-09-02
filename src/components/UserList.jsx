@@ -3,39 +3,14 @@ import React, { useEffect, useState } from "react";
 import { auth, db } from "../store/firebase";
 import PrivateSentbox from "./PrivateSentbox";
 import PrivateMessages from "./PrivateMessages";
+import useUserHook from "../Hooks/useUserHook";
+import useUserLists from "../Hooks/useUserLists";
 
 const UserList = ({ isUserLists, setIsUserLists }) => {
-  const [users, setUsers] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
   const [currentUid, setCurrentUid] = useState(null);
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const usersCollection = collection(db, "users");
-        const usersSnapshot = await getDocs(usersCollection);
-        const usersList = usersSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setUsers(usersList);
-      } catch (error) {
-        console.error("Error fetching users: ", error);
-      }
-    };
-    fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setCurrentUser(user);
-      } else {
-        setCurrentUser(null);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
+  const {currentUser}=useUserHook()
+  const {users,isError,isLoading}=useUserLists()
+  // console.log("UserList",isError,isLoading,users)
 
   const createChatRoom = async (user) => {
     try {
@@ -105,7 +80,7 @@ const UserList = ({ isUserLists, setIsUserLists }) => {
           </div>
 
           <div className=" w-full fixed bottom-0 left-0 right-0">
-            <PrivateSentbox currentUid={currentUid} currentUser={currentUser} />
+            <PrivateSentbox currentUid={currentUid} currentUser={currentUser} setIsUserLists={setIsUserLists}/>
           </div>
         </>
       )}
