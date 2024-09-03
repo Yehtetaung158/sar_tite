@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.lightBg {
+    background-image: linear-gradient(to right bottom, #baff4c, #9ad338, #7aa924, #5b8011, #3e5a00);
+}
+
+.lightBg1 {
+    background-image: linear-gradient(to right bottom, #e9fbcc, #ddfda9, #d0fe83, #c3ff58, #b4ff0c);
+}
+
+.blackBg1{
+    background-image: linear-gradient(to right bottom, #061d41, #00263f, #002a2e, #002b1a, #212a0d);
+}

@@ -21,7 +21,7 @@ const LogoutBtn = () => {
   return (
     <button
       onClick={handleLogout}
-      className="inline-flex gap-2 items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base md:mt-0"
+      className="inline-flex gap-2 items-center bg-gray-100 dark:bg-gray-500 text-red-600 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base md:mt-0"
     >
       <p className=" text-sm">Log Out</p>
       {/* <img className=" size-6" src={logOutIcon} alt="" /> */}

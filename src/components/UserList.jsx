@@ -1,16 +1,17 @@
-import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
-import { auth, db } from "../store/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import React, { useState } from "react";
+import { db } from "../store/firebase";
 import PrivateSentbox from "./PrivateSentbox";
 import PrivateMessages from "./PrivateMessages";
 import useUserHook from "../Hooks/useUserHook";
 import useUserLists from "../Hooks/useUserLists";
+import unknownUser from "../assets/user-svgrepo-com.svg";
 
 const UserList = ({ isUserLists, setIsUserLists }) => {
   const [currentUid, setCurrentUid] = useState(null);
-  const {currentUser}=useUserHook()
-  const {users,isError,isLoading}=useUserLists()
-  // console.log("UserList",isError,isLoading,users)
+  const { currentUser } = useUserHook();
+  const { users, isError, isLoading } = useUserLists();
+  console.log("UserList",isError,isLoading,users)
 
   const createChatRoom = async (user) => {
     try {
@@ -20,7 +21,7 @@ const UserList = ({ isUserLists, setIsUserLists }) => {
         {
           displayName: user.displayName || "Anonymous",
           email: user.email,
-          profilePicture: user.photoURL || "",
+          profilePicture: user.profilePicture || "",
           lastLogin: new Date(),
         },
         { merge: true }
@@ -60,14 +61,36 @@ const UserList = ({ isUserLists, setIsUserLists }) => {
     <div className="w-full relative">
       {isUserLists ? (
         <div className="p-4">
-          <ul className="space-y-2">
+          <ul className=" w-full divide-y divide-gray-200 dark:divide-gray-700">
             {users.map((user) => (
-              <li key={user.id}>
+              <li key={user.id} className="pb-3 sm:pb-4">
                 <button
                   onClick={() => createPrivateChatRoom(user)}
-                  className=" bg-gray-400 text-white px-4 py-2 w-full text-start rounded-md"
+                  className="flex justify-between w-full items-center space-x-4 rtl:space-x-reverse"
                 >
-                  {user.displayName || "Anonymous"}
+                  <div className="flex gap-2">
+                    <div className="flex-shrink-0">
+                      <img
+                        className="w-8 h-8 rounded-full"
+                        src={user.photoURL || unknownUser}
+                        alt={`${
+                          user.displayName || "Anonymous"
+                        }'s profile picture`}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0 text-start">
+                      <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
+                        {user.displayName || "Anonymous"}
+                      </p>
+                      <p className="text-sm text-gray-500 truncate dark:text-gray-400">
+                        {user.email || "No email available"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="inline-flex items-center text-base font-semibold dark:text-white text-indigo-400">
+                    detail
+                  </div>
                 </button>
               </li>
             ))}
@@ -80,7 +103,11 @@ const UserList = ({ isUserLists, setIsUserLists }) => {
           </div>
 
           <div className=" w-full fixed bottom-0 left-0 right-0">
-            <PrivateSentbox currentUid={currentUid} currentUser={currentUser} setIsUserLists={setIsUserLists}/>
+            <PrivateSentbox
+              currentUid={currentUid}
+              currentUser={currentUser}
+              setIsUserLists={setIsUserLists}
+            />
           </div>
         </>
       )}

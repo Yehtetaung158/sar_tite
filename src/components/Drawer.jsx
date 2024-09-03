@@ -4,6 +4,7 @@ import { setIsDropDwonOpen } from "../store/slice/navSlice";
 import { useNavigate } from "react-router-dom";
 import LogoutBtn from "../pages/auth/LogoutBtn";
 import Profile from "../pages/Profile";
+import Theme from "./Theme";
 
 const Drawer = () => {
   const nav = useNavigate();
@@ -14,14 +15,14 @@ const Drawer = () => {
       <div
         id="drawer-example"
         className={`fixed top-0 right-0 z-40 h-screen p-4 overflow-y-auto transition-transform ${
-          !isDropDownOpen && "translate-x-full"
-        }  bg-white w-80`}
+          !isDropDownOpen && "translate-x-full "
+        }  bg-white dark:bg-darkPrimary w-80`}
         tabIndex={-1}
         aria-labelledby="drawer-label"
       >
         <h5
           id="drawer-label"
-          className="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400"
+          className="inline-flex items-center mb-4 text-base font-semibold text-primary"
         >
           <svg
             className="w-4 h-4 me-2.5"
@@ -34,6 +35,7 @@ const Drawer = () => {
           </svg>
           Info
         </h5>
+
         <button
           onClick={() => dispatch(setIsDropDwonOpen(false))}
           type="button"
@@ -58,9 +60,13 @@ const Drawer = () => {
           </svg>
           <span className="sr-only">Close menu</span>
         </button>
-        <Profile/>
-        <ul className=" space-y-4">
-          <li>Theme</li>
+
+        <Profile />
+
+        <ul className=" space-y-4 mt-3">
+          <li>
+            <Theme />
+          </li>
           <LogoutBtn />
         </ul>
       </div>

@@ -3,10 +3,10 @@ import useUserHook from "../Hooks/useUserHook";
 import useGetDoc from "../Hooks/useGetDoc";
 
 const MessageList = () => {
-  const collectionPath="messages"
-  const {messages,isLoading,isError}=useGetDoc(collectionPath)
+  const collectionPath = "messages";
+  const { messages, isLoading, isError } = useGetDoc(collectionPath);
   const messagesEndRef = useRef(null);
-  const {currentUser}=useUserHook()
+  const { currentUser } = useUserHook();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -15,7 +15,7 @@ const MessageList = () => {
   const formatTimestamp = (timestamp) => {
     if (!timestamp?.toDate) return "No timestamp available";
     const date = new Date(timestamp.toDate());
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   return (
@@ -26,18 +26,28 @@ const MessageList = () => {
           return (
             <li
               key={index}
-              className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}
+              className={`flex ${
+                isCurrentUser ? "justify-end" : "justify-start"
+              }`}
             >
               <div
                 className={`max-w-xs md:max-w-md p-3 rounded-lg shadow-md ${
-                  isCurrentUser ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-800"
+                  isCurrentUser
+                    ? "bg-primary text-white"
+                    : "bg-gray-100 dark:bg-darkText1 text-gray-800"
                 }`}
               >
                 {!isCurrentUser && (
-                  <span className="block font-bold mb-1">{message.username}</span>
+                  <span className="block font-bold mb-1">
+                    {message.username}
+                  </span>
                 )}
                 <span className="block">{message.text}</span>
-                <span className="text-xs text-gray-400 mt-1 block text-right">
+                <span
+                  className={`text-xs  mt-1 ${
+                    isCurrentUser ? "text-gray-200" : "text-gray-500"
+                  } block text-right`}
+                >
                   {formatTimestamp(message.timestamp)}
                 </span>
               </div>

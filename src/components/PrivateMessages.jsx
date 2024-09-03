@@ -34,8 +34,8 @@ const PrivateMessages = ({ currentUid }) => {
               <div
                 className={`max-w-xs md:max-w-md p-3 rounded-lg shadow-md ${
                   isCurrentUser
-                    ? " bg-gray-900 text-white"
-                    : "bg-gray-200 text-black"
+                    ? "bg-primary text-white"
+                    : "bg-gray-100 dark:bg-darkText1 text-gray-800"
                 }`}
               >
                 {!isCurrentUser && (
@@ -44,7 +44,9 @@ const PrivateMessages = ({ currentUid }) => {
                   </span>
                 )}
                 <span className="block">{message.text}</span>
-                <span className="text-xs text-gray-400 mt-1 block text-right">
+                <span className={`text-xs  mt-1 ${
+                    isCurrentUser ? "text-gray-200" : "text-gray-500"
+                  } block text-right`}>
                   {formatTimestamp(message.timestamp)}
                 </span>
               </div>

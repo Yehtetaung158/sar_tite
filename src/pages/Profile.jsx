@@ -35,10 +35,10 @@ const Profile = () => {
                 : "text-start space-y-1"
             } lg:w-2/3 w-full `}
           >
-            <h1 className="title-font sm:text-2xl text-3xl font-medium text-gray-900">
+            <h1 className="title-font sm:text-2xl text-3xl font-medium text-gray-900 dark:text-white">
               {currentUser?.displayName}
             </h1>
-            <p>{currentUser?.email}</p>
+            <p className=" dark:text-white">{currentUser?.email}</p>
             {isProfileDetail && (
               <button onClick={()=>setIsEdit(true)} className=" inline-flex text-gray-700 bg-gray-100 border-0 py-1 px-6 focus:outline-none hover:bg-gray-200 rounded text-lg">
                 Edit
