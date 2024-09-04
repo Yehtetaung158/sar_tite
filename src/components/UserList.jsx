@@ -1,5 +1,5 @@
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { db } from "../store/firebase";
 import PrivateSentbox from "./PrivateSentbox";
 import PrivateMessages from "./PrivateMessages";
@@ -8,15 +8,23 @@ import useUserLists from "../Hooks/useUserLists";
 // import unknownUser from "../assets/user-svgrepo-com.svg";
 import unknownUser from "../assets/people-unknown-svgrepo-com.svg";
 import { useDispatch, useSelector } from "react-redux";
-import { setisPeopleDetail, setcurrentPeopleId } from "../store/slice/navSlice";
+import {
+  setisPeopleDetail,
+  setCurrentUid,
+  setCurrentUser,
+  setcurrentPeopleId,
+} from "../store/slice/navSlice";
 import PeopleListLoader from "./loaders/PeopleListLoader";
 
 const UserList = ({ isUserLists, setIsUserLists }) => {
-  const [currentUid, setCurrentUid] = useState(null);
   const { currentUser } = useUserHook();
   const { users, isError, isLoading } = useUserLists();
   const dispatch = useDispatch();
   const isPeopleDetail = useSelector((state) => state.nav.isPeopleDetail);
+  const currentUid = useSelector((state) => state.nav.currentUid);
+  const currentMessagePeople = useSelector(
+    (state) => state.nav.currentMessagePeople
+  );
 
   const createChatRoom = async (user) => {
     try {
@@ -31,9 +39,10 @@ const UserList = ({ isUserLists, setIsUserLists }) => {
         },
         { merge: true }
       );
-      setCurrentUid(chatRoomUid);
+      dispatch(setCurrentUid(chatRoomUid));
+      // setCurrentUid(chatRoomUid);
       setIsUserLists(false);
-      console.log("Chat room created with ID:", chatRoomUid);
+      console.log("Chat room created");
     } catch (e) {
       console.log("Error creating chat room", e.message);
     }
@@ -44,7 +53,7 @@ const UserList = ({ isUserLists, setIsUserLists }) => {
       const chatRoomSnapshot = await getDoc(doc(db, "chatRooms", chatRoomUid));
       if (chatRoomSnapshot.exists()) {
         setIsUserLists(false);
-        console.log("Chat room exists:", chatRoomUid);
+        console.log("Chat room exists:");
       } else {
         await createChatRoom(user);
       }
@@ -55,12 +64,18 @@ const UserList = ({ isUserLists, setIsUserLists }) => {
 
   const createPrivateChatRoom = async (user) => {
     const chatRoomUid = [currentUser?.uid, user?.id].sort().join("_");
-    setCurrentUid(chatRoomUid);
+    dispatch(setCurrentUid(chatRoomUid));
     if (chatRoomUid) {
-      console.log("Creating or getting chat room for UID:", chatRoomUid);
+      // console.log("Creating or getting chat room for UID:", chatRoomUid);
       await getChatRoom(chatRoomUid, user);
     }
   };
+
+  useEffect(() => {
+    if (currentMessagePeople) {
+      createPrivateChatRoom(currentMessagePeople);
+    }
+  }, [currentMessagePeople]);
 
   return (
     <div className="w-full relative">
@@ -108,10 +123,18 @@ const UserList = ({ isUserLists, setIsUserLists }) => {
                             onClick={() => {
                               dispatch(setisPeopleDetail(!isPeopleDetail));
                               dispatch(setcurrentPeopleId(user.id));
+                              dispatch(
+                                setCurrentUser({
+                                  id: user.id,
+                                  displayName: user.displayName,
+                                  email: user.email,
+                                  photoURL: user.photoURL,
+                                })
+                              );
                             }}
                             className="inline-flex items-center text-base font-semibold dark:text-white text-indigo-400"
                           >
-                            detail
+                            Detail
                           </button>
                         </div>
                       </li>

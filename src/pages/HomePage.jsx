@@ -14,7 +14,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   const { currentUser, isError, isLoading } = useUserHook();
   const isPeopleDetail = useSelector((state) => state.nav.isPeopleDetail);
-  const currentPeopleId = useSelector((state) => state.nav.currentPeopleId);
+  // const currentPeopleId = useSelector((state) => state.nav.currentPeopleId);
 
   useEffect(() => {
     if (!isLoading && !currentUser) {

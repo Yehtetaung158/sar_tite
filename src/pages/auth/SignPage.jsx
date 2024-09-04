@@ -1,27 +1,28 @@
 import {
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import { auth } from "../../store/firebase";
+import { auth, db } from "../../store/firebase"; // Ensure db is imported correctly from your firebase config
 import useUserHook from "../../Hooks/useUserHook";
+import { setDoc, doc } from "firebase/firestore"; // Ensure doc is imported
 
 const SignPage = () => {
   const nav = useNavigate();
   const [submitError, setSubmitError] = useState("");
   const { currentUser, isError, isLoading } = useUserHook();
+  const [isSaved,setIsSaved]=useState(false)
 
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && isSaved) {
       nav("/home");
     } else if (!isLoading) {
-      nav("/");
+      nav("/"); // Navigate to sign-up page if user is not logged in and not loading
     }
-  }, [currentUser,isError, nav]);
+  }, [currentUser,isSaved, isError, isLoading, nav]);
 
   const initialValues = {
     name: "",
@@ -45,6 +46,25 @@ const SignPage = () => {
       .required("Password is required"),
   });
 
+  const saveUser = async (user) => {
+    try {
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          displayName: user.displayName || "Anonymous",
+          email: user.email,
+          profilePicture: user.photoURL || "",
+          lastLogin: new Date(),
+        },
+        { merge: true }
+      );
+      setIsSaved(true)
+    } catch (e) {
+      console.error("Error saving user data:", e.message);
+      setSubmitError("Failed to save user data. Please try again.");
+    }
+  };
+
   const onSubmit = async (values, { setSubmitting }) => {
     setSubmitError("");
     try {
@@ -54,22 +74,20 @@ const SignPage = () => {
         values.email,
         values.password
       );
-      if (userCredential) {
-        await updateProfile(auth.currentUser, {
-          displayName: values.name,
-        });
+      const user = userCredential.user;
+      if (user) {
+        await updateProfile(user, { displayName: values.name });
+        await saveUser(user);
         nav("/login");
       }
     } catch (error) {
       console.error("Error Code:", error.code);
       console.error("Error Message:", error.message);
-      console.error("Error Details:", error); // Log the full error object
       setSubmitError(error.message);
     } finally {
       setSubmitting(false);
     }
   };
-  
 
   return (
     <section className="text-gray-400 bg-gray-900 body-font relative h-screen flex items-center">
@@ -82,7 +100,7 @@ const SignPage = () => {
           <Form className="container px-5 py-24 mx-auto">
             <div className="flex flex-col text-center w-full mb-12">
               <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-white">
-                Sign In
+                Sign Up
               </h1>
             </div>
             <div className="lg:w-1/2 md:w-2/3 mx-auto">
@@ -158,9 +176,9 @@ const SignPage = () => {
                 </div>
                 <button
                   onClick={() => nav("/login")}
-                  className=" p-2 w-full text-center"
+                  className="p-2 w-full text-center"
                 >
-                  I don't have any account. Sign Up
+                  I already have an account. Sign In
                 </button>
                 {submitError && (
                   <div className="p-2 w-full text-red-500 text-center">

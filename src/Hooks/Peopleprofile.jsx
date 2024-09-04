@@ -1,23 +1,26 @@
 import React from "react";
 import useUserLists from "./useUserLists";
 import { useDispatch, useSelector } from "react-redux";
-import { setisPeopleDetail } from "../store/slice/navSlice";
+import { setcurrentMessagePeople, setisPeopleDetail } from "../store/slice/navSlice";
 // import unKnownIcon from "../assets/user-svgrepo-com.svg"
-import unKnownIcon from "../assets/people-unknown-svgrepo-com.svg"
+import unKnownIcon from "../assets/people-unknown-svgrepo-com.svg";
 
 const Peopleprofile = () => {
-  const dispathc=useDispatch()
+  const dispatch = useDispatch();
   const { isError, isLoading, users } = useUserLists();
   const isPeopleDetail = useSelector((state) => state.nav.isPeopleDetail);
   const currentPeopleId = useSelector((state) => state.nav.currentPeopleId);
   const currentPerson = users?.find((p) => p.id === currentPeopleId);
-  console.log(currentPerson);
+  // console.log(currentPerson);
+  // const currentUid = useSelector((state) => state.nav.currentUid);
+  const currentUser = useSelector((state) => state.nav.currentUser);
 
   return (
     <div className=" relative h-full flex justify-center ">
       <button
-      className=" absolute top-2 right-2"
-      onClick={()=>dispathc(setisPeopleDetail(!isPeopleDetail))}>
+        className=" absolute top-2 right-2"
+        onClick={() => dispatch(setisPeopleDetail(!isPeopleDetail))}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -34,10 +37,26 @@ const Peopleprofile = () => {
         </svg>
       </button>
       <div className=" flex flex-col justify-center items-center gap-4">
-        <img className=" w-2/3" src={currentPerson?.profilePicture || unKnownIcon} alt="" />
-        <h1 className=" text-darkPrimary text-2xl font-bold dark:text-white">{currentPerson?.displayName || "Annamous"}</h1>
-        <p className=" text-darkPrimary dark:text-white">{currentPerson?.email || "no Email"}</p>
-
+        <img
+          className=" w-2/3"
+          src={currentPerson?.profilePicture || unKnownIcon}
+          alt=""
+        />
+        <h1 className=" text-darkPrimary text-2xl font-bold dark:text-white">
+          {currentPerson?.displayName || "Annamous"}
+        </h1>
+        <p className=" text-darkPrimary dark:text-white">
+          {currentPerson?.email || "no Email"}
+        </p>
+        <button
+          onClick={async () => {
+            dispatch(setisPeopleDetail(!isPeopleDetail));
+            dispatch(setcurrentMessagePeople(currentUser))
+          }}
+          className="bg-primary px-2 py-1 rounded-lg text-white"
+        >
+          Message
+        </button>
       </div>
     </div>
   );
