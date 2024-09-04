@@ -23,7 +23,7 @@ const PrivateMessages = ({ currentUid }) => {
       <ul className="space-y-3">
         {messages.length === 0 ? (
           <li className="w-full mx-auto text-center h-full p-[100px] dark:text-white">
-            You can send a message
+            You can send messages
           </li>
         ) : (
           messages.map((message, index) => {
