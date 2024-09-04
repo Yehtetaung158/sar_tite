@@ -8,6 +8,7 @@ const initialState = {
   currentUid: null,
   currentUser: null,
   currentMessagePeople: null,
+  isAppLoad: false,
 };
 
 const navSlice = createSlice({
@@ -31,15 +32,18 @@ const navSlice = createSlice({
     },
     setCurrentUser(state, action) {
       const user = action.payload;
-
-      // Convert non-serializable values (like Firestore Timestamp) to serializable formats
       state.currentUser = {
         ...user,
-        lastLogin: user?.lastLogin ? user.lastLogin.toDate().toISOString() : null,
+        lastLogin: user?.lastLogin
+          ? user.lastLogin.toDate().toISOString()
+          : null,
       };
     },
     setcurrentMessagePeople(state, action) {
       state.currentMessagePeople = action.payload;
+    },
+    setisAppLoad(state, action) {
+      state.isAppLoad = action.payload;
     },
   },
 });
@@ -52,6 +56,7 @@ export const {
   setDarkMode,
   setisPeopleDetail,
   setcurrentPeopleId,
+  setisAppLoad,
 } = navSlice.actions;
 
 export default navSlice.reducer;

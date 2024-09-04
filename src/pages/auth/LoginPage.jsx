@@ -6,20 +6,22 @@ import * as Yup from "yup";
 import { auth, db } from "../../store/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import useUserHook from "../../Hooks/useUserHook";
+import { useDispatch } from "react-redux";
+import { setisAppLoad } from "../../store/slice/navSlice";
 
 const SignPage = () => {
   const nav = useNavigate();
   const [submitError, setSubmitError] = useState("");
-
+  const disaptch=useDispatch()
   const { currentUser, isError, isLoading } = useUserHook();
 
-  useEffect(() => {
-    if (currentUser) {
-      nav("/home");
-    } else if (!isLoading) {
-      nav("/login");
-    }
-  }, [currentUser, nav]);
+  // useEffect(() => {
+  //   if (currentUser) {
+  //     nav("/home");
+  //   } else if (!isLoading) {
+  //     nav("/login");
+  //   }
+  // }, [currentUser, nav]);
 
   const initialValues = {
     email: "",
@@ -40,31 +42,40 @@ const SignPage = () => {
   });
 
   const saveUser = async (user) => {
-    try {
-      await setDoc(
-        doc(db, "users", user.uid),
-        {
-          displayName: user.displayName || "Anonymous",
-          email: user.email,
-          profilePicture: user.photoURL || "",
-          lastLogin: new Date(),
-        },
-        { merge: true }
-      );
-    } catch (e) {
-      console.log(e.message);
+    if (user) {
+      try {
+        await setDoc(
+          doc(db, "users", user.uid),
+          {
+            displayName: user.displayName || "Anonymous",
+            email: user.email,
+            profilePicture: user.photoURL || "",
+            lastLogin: new Date(),
+          },
+          { merge: true }
+        );
+        setIsSaved(true);
+      } catch (e) {
+        console.error("Error saving user data:", e.message);
+        setSubmitError("Failed to save user data. Please try again.");
+      }
     }
+    return true;
   };
 
   const onSubmit = async (values, { setSubmitting }) => {
     setSubmitError("");
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
-      
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        values.email,
+        values.password
+      );
+
       const user = userCredential.user;
 
       await saveUser(user);
-      
+
       nav("/home");
     } catch (error) {
       setSubmitError("An error occurred. Please try again.");
@@ -72,6 +83,18 @@ const SignPage = () => {
       setSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (currentUser) {
+      const saved = saveUser();
+      if (saved) {
+        nav("/home");
+      }
+    } else if (isError || !currentUser) {
+      nav("/login");
+    }
+  }, [currentUser, isError, isLoading, nav]);
 
   return (
     <section className="text-gray-400 bg-gray-900 body-font relative h-screen flex items-center">
@@ -135,11 +158,13 @@ const SignPage = () => {
                     type="submit"
                     className="flex mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg disabled:bg-indigo-300"
                   >
-                    {isSubmitting ? <>Submitting...</> : <>Submit</>}
+                    {isSubmitting ? <><span className="loader"></span></> : <>SigIn</>}
                   </button>
                 </div>
                 <button
-                  onClick={() => nav("/")}
+                  onClick={() => {
+                    disaptch(setisAppLoad(true))
+                    nav("/")}}
                   className=" p-2 w-full text-center"
                 >
                   I don't have an account. Sign Up
