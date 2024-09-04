@@ -1,28 +1,17 @@
-import {
-  createUserWithEmailAndPassword,
-  updateProfile,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import { auth, db } from "../../store/firebase"; // Ensure db is imported correctly from your firebase config
+import { auth, db } from "../../store/firebase";
 import useUserHook from "../../Hooks/useUserHook";
-import { setDoc, doc } from "firebase/firestore"; // Ensure doc is imported
+import { setDoc, doc } from "firebase/firestore";
 
 const SignPage = () => {
   const nav = useNavigate();
   const [submitError, setSubmitError] = useState("");
   const { currentUser, isError, isLoading } = useUserHook();
-  const [isSaved,setIsSaved]=useState(false)
-
-  useEffect(() => {
-    if (currentUser && isSaved) {
-      nav("/home");
-    } else if (!isLoading) {
-      nav("/"); // Navigate to sign-up page if user is not logged in and not loading
-    }
-  }, [currentUser,isSaved, isError, isLoading, nav]);
+  const [isSaved, setIsSaved] = useState(false);
 
   const initialValues = {
     name: "",
@@ -47,28 +36,30 @@ const SignPage = () => {
   });
 
   const saveUser = async (user) => {
-    try {
-      await setDoc(
-        doc(db, "users", user.uid),
-        {
-          displayName: user.displayName || "Anonymous",
-          email: user.email,
-          profilePicture: user.photoURL || "",
-          lastLogin: new Date(),
-        },
-        { merge: true }
-      );
-      setIsSaved(true)
-    } catch (e) {
-      console.error("Error saving user data:", e.message);
-      setSubmitError("Failed to save user data. Please try again.");
-    }
+    if (user) {
+      try {
+        await setDoc(
+          doc(db, "users", user.uid),
+          {
+            displayName: user.displayName || "Anonymous",
+            email: user.email,
+            profilePicture: user.photoURL || "",
+            lastLogin: new Date(),
+          },
+          { merge: true }
+        );
+        setIsSaved(true);
+      } catch (e) {
+        console.error("Error saving user data:", e.message);
+        setSubmitError("Failed to save user data. Please try again.");
+      }
+    }return true
   };
 
   const onSubmit = async (values, { setSubmitting }) => {
     setSubmitError("");
     try {
-      console.log("Submitted values:", values); // Log the values
+      console.log("Submitted values:", values);
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         values.email,
@@ -88,6 +79,18 @@ const SignPage = () => {
       setSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (currentUser) {
+      const saved = saveUser();
+      if (saved) {
+        nav("/home");
+      }
+    } else if (isError || !currentUser) {
+      nav("/");
+    }
+  }, [currentUser, isSaved, isError, isLoading, nav]);
 
   return (
     <section className="text-gray-400 bg-gray-900 body-font relative h-screen flex items-center">
