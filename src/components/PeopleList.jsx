@@ -3,12 +3,11 @@ import UserList from "./UserList";
 
 const PeopleList = () => {
   const [isUserLists, setIsUserLists] = useState(true);
-  console.log("isUserLists", isUserLists);
 
   return (
-    <>
+    <div className=" w-full">
           <UserList setIsUserLists={setIsUserLists} isUserLists={isUserLists} />
-    </>
+    </div>
   );
 };
 

@@ -39,7 +39,7 @@ const SentBox = () => {
   };
 
   return (
-    <section className=" w-full text-gray-600 body-font bg-secondary">
+    <section className=" w-full max-w-[1144px] mx-auto text-gray-600 body-font bg-secondary">
       <form
         onSubmit={messageSentHandle}
         className="w-full flex gap-2 items-center justify-between"

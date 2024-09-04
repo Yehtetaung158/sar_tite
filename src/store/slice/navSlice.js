@@ -2,7 +2,9 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     isDropDownOpen:false,
-    mode:false
+    mode:false,
+    isPeopleDetail:false,
+    currentPeopleId:null
 };
 
 const navSlice = createSlice({
@@ -14,6 +16,12 @@ const navSlice = createSlice({
     },
     setDarkMode(state,action){
         state.mode = action.payload;
+    },
+    setisPeopleDetail(state,action){
+      state.isPeopleDetail=action.payload;
+    },
+    setcurrentPeopleId(state,action){
+      state.currentPeopleId=action.payload;
     }
    
   },
@@ -21,7 +29,9 @@ const navSlice = createSlice({
 
 export const {
   setIsDropDwonOpen,
-  setDarkMode
+  setDarkMode,
+  setisPeopleDetail,
+  setcurrentPeopleId
 } = navSlice.actions;
 
 

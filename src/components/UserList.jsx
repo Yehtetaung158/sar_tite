@@ -5,13 +5,18 @@ import PrivateSentbox from "./PrivateSentbox";
 import PrivateMessages from "./PrivateMessages";
 import useUserHook from "../Hooks/useUserHook";
 import useUserLists from "../Hooks/useUserLists";
-import unknownUser from "../assets/user-svgrepo-com.svg";
+// import unknownUser from "../assets/user-svgrepo-com.svg";
+import unknownUser from "../assets/people-unknown-svgrepo-com.svg";
+import { useDispatch, useSelector } from "react-redux";
+import { setisPeopleDetail, setcurrentPeopleId } from "../store/slice/navSlice";
+import PeopleListLoader from "./loaders/PeopleListLoader";
 
 const UserList = ({ isUserLists, setIsUserLists }) => {
   const [currentUid, setCurrentUid] = useState(null);
   const { currentUser } = useUserHook();
   const { users, isError, isLoading } = useUserLists();
-  console.log("UserList",isError,isLoading,users)
+  const dispatch = useDispatch();
+  const isPeopleDetail = useSelector((state) => state.nav.isPeopleDetail);
 
   const createChatRoom = async (user) => {
     try {
@@ -62,38 +67,59 @@ const UserList = ({ isUserLists, setIsUserLists }) => {
       {isUserLists ? (
         <div className="p-4">
           <ul className=" w-full divide-y divide-gray-200 dark:divide-gray-700">
-            {users.map((user) => (
-              <li key={user.id} className="pb-3 sm:pb-4">
-                <button
-                  onClick={() => createPrivateChatRoom(user)}
-                  className="flex justify-between w-full items-center space-x-4 rtl:space-x-reverse"
-                >
-                  <div className="flex gap-2">
-                    <div className="flex-shrink-0">
-                      <img
-                        className="w-8 h-8 rounded-full"
-                        src={user.photoURL || unknownUser}
-                        alt={`${
-                          user.displayName || "Anonymous"
-                        }'s profile picture`}
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0 text-start">
-                      <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
-                        {user.displayName || "Anonymous"}
-                      </p>
-                      <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-                        {user.email || "No email available"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="inline-flex items-center text-base font-semibold dark:text-white text-indigo-400">
-                    detail
-                  </div>
-                </button>
-              </li>
-            ))}
+            {isLoading ? (
+              <>
+                <PeopleListLoader />
+              </>
+            ) : (
+              <>
+                {isError ? (
+                  <>
+                    <h1>{isError.message}</h1>
+                  </>
+                ) : (
+                  <>
+                    {users.map((user) => (
+                      <li key={user.id} className="pb-3 sm:pb-4">
+                        <div className="flex justify-between w-full items-center space-x-4 rtl:space-x-reverse">
+                          <button
+                            onClick={() => createPrivateChatRoom(user)}
+                            className="flex gap-2 flex-grow"
+                          >
+                            <div className="flex-shrink-0">
+                              <img
+                                className=" size-11 rounded-full"
+                                src={user.photoURL || unknownUser}
+                                alt={`${
+                                  user.displayName || "Anonymous"
+                                }'s profile picture`}
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0 text-start">
+                              <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
+                                {user.displayName || "Anonymous"}
+                              </p>
+                              <p className="text-sm text-gray-500 truncate dark:text-gray-400">
+                                {user.email || "No email available"}
+                              </p>
+                            </div>
+                          </button>
+                          <button
+                            onClick={() => {
+                              dispatch(setisPeopleDetail(!isPeopleDetail));
+                              dispatch(setcurrentPeopleId(user.id));
+                            }}
+                            className="inline-flex items-center text-base font-semibold dark:text-white text-indigo-400"
+                          >
+                            detail
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </>
+                )}
+              </>
+            )}
           </ul>
         </div>
       ) : (
@@ -101,8 +127,7 @@ const UserList = ({ isUserLists, setIsUserLists }) => {
           <div className="flex-grow overflow-auto">
             <PrivateMessages currentUid={currentUid} />
           </div>
-
-          <div className=" w-full fixed bottom-0 left-0 right-0">
+          <div className=" max-w-[1144px] mx-auto fixed bottom-0 right-0 left-0">
             <PrivateSentbox
               currentUid={currentUid}
               currentUser={currentUser}

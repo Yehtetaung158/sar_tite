@@ -1,4 +1,4 @@
-import {  useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import useUserHook from "../Hooks/useUserHook";
 import useGetDoc from "../Hooks/useGetDoc";
 
@@ -6,7 +6,7 @@ const PrivateMessages = ({ currentUid }) => {
   const messagesEndRef = useRef(null);
   const { currentUser } = useUserHook();
   const collectionPath = `chatRooms/${currentUid}/messages`;
-  const { messages, isError, isLoading } = useGetDoc(collectionPath);
+  const { messages = [], isError, isLoading } = useGetDoc(collectionPath);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -19,40 +19,47 @@ const PrivateMessages = ({ currentUid }) => {
   };
 
   return (
-    <div className="flex-grow overflow-y-auto px-4 pb-10">
+    <div className="flex-grow overflow-y-auto px-4 mb-10">
       <ul className="space-y-3">
-        {messages.map((message, index) => {
-          const isCurrentUser = message.uid === currentUser?.uid;
-          // console.log(currentUser?.uid);
-          return (
-            <li
-              key={index}
-              className={`flex ${
-                isCurrentUser ? "justify-end" : "justify-start"
-              }`}
-            >
-              <div
-                className={`max-w-xs md:max-w-md p-3 rounded-lg shadow-md ${
-                  isCurrentUser
-                    ? "bg-primary text-white"
-                    : "bg-gray-100 dark:bg-darkText1 text-gray-800"
+        {messages.length === 0 ? (
+          <li className="w-full mx-auto text-center h-full p-[100px] dark:text-white">
+            You can send a message
+          </li>
+        ) : (
+          messages.map((message, index) => {
+            const isCurrentUser = message.uid === currentUser?.uid;
+            return (
+              <li
+                key={index}
+                className={`flex ${
+                  isCurrentUser ? "justify-end" : "justify-start"
                 }`}
               >
-                {!isCurrentUser && (
-                  <span className="block font-semibold mb-1">
-                    {message.username}
+                <div
+                  className={`max-w-xs md:max-w-md p-3 rounded-lg shadow-md ${
+                    isCurrentUser
+                      ? "bg-primary text-white"
+                      : "bg-gray-100 dark:bg-darkText1 text-gray-800"
+                  }`}
+                >
+                  {!isCurrentUser && (
+                    <span className="block font-semibold mb-1">
+                      {message.username}
+                    </span>
+                  )}
+                  <span className="block">{message.text}</span>
+                  <span
+                    className={`text-xs mt-1 ${
+                      isCurrentUser ? "text-gray-200" : "text-gray-500"
+                    } block text-right`}
+                  >
+                    {formatTimestamp(message.timestamp)}
                   </span>
-                )}
-                <span className="block">{message.text}</span>
-                <span className={`text-xs  mt-1 ${
-                    isCurrentUser ? "text-gray-200" : "text-gray-500"
-                  } block text-right`}>
-                  {formatTimestamp(message.timestamp)}
-                </span>
-              </div>
-            </li>
-          );
-        })}
+                </div>
+              </li>
+            );
+          })
+        )}
         <div ref={messagesEndRef} />
       </ul>
     </div>

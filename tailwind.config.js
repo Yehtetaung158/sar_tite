@@ -14,7 +14,8 @@ export default {
         secondary:"#cbf3f0",
         darkText1:"#ced4da",
         darkText2:"#f8f9fa",
-        darkSecondary:"#adb5bd"
+        darkSecondary:"#adb5bd",
+        primaryHoverbg:"#06d6a0"
       }
     },
   },
